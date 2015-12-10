@@ -7,10 +7,13 @@ class AboutKeywordArguments < Neo::Koan
   end
 
   def test_keyword_arguments
-    assert_equal __, method_with_keyword_arguments.class
-    assert_equal __, method_with_keyword_arguments
-    assert_equal __, method_with_keyword_arguments(one: 'one')
-    assert_equal __, method_with_keyword_arguments(two: 2)
+    # Weird - calling the class method on the method results in the class
+    # method being applied to the result and the result from that being 
+    # the final return.
+    assert_equal Array, method_with_keyword_arguments.class
+    assert_equal [1, 'two'], method_with_keyword_arguments
+    assert_equal ['one', 'two'], method_with_keyword_arguments(one: 'one')
+    assert_equal [1, 2], method_with_keyword_arguments(two: 2)
   end
 
   def method_with_keyword_arguments_with_mandatory_argument(one, two: 2, three: 3)
@@ -18,14 +21,15 @@ class AboutKeywordArguments < Neo::Koan
   end
 
   def test_keyword_arguments_with_wrong_number_of_arguments
-    exception = assert_raise (___) do
+    exception = assert_raise (ArgumentError) do
       method_with_keyword_arguments_with_mandatory_argument
     end
-    assert_match(/__/, exception.message)
+    assert_match(/0 for 1/, exception.message)
   end
 
   # THINK ABOUT IT:
   #
   # Keyword arguments always have a default value, making them optional to the caller
+  # They are not included in the error message, because they would not cause the error.
 
 end
