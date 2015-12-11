@@ -35,21 +35,17 @@ class Triangle
       return :equilateral
     elsif is_isoceles?
       return :isosceles
-    elsif is_scalene?
-      return :scalene
-    end    
+    end
+    :scalene
   end
 
   private
+
   def is_equilateral?()
     (a == b && b == c)
   end
 
   def is_isoceles?()
-    ((a == b && b != c) || (a == c && a != b) || (b == c && a != b))
-  end
-
-  def is_scalene?()
-    (a != b && b != c)
+    (a == b || b == c || a == c)
   end
 end
