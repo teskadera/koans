@@ -21,44 +21,40 @@ end
 class TriangleError < StandardError
 end
 
+
+# Refactors assisted by StackOverflow question listed in about_triangle_project_2.rb
 class Triangle
   attr_reader :a, :b, :c
   def initialize(a, b, c)
-    @a, @b, @c = a, b, c
+    @a, @b, @c = params = [a, b, c].sort 
 
-    if (self.a <= 0 || self.b <= 0 || self.c <= 0)
-      raise TriangleError, "A side is non-existent or negative"
-    end
-    if all_sides_valid?
-      raise TriangleError, "A side is impossibly short, with regards to the others"
-    end
-
+    raise TriangleError, "A side is less-than-or-equal-to 0" if (params.min <= 0)
+    raise TriangleError, "A side is impossibly short" if !all_sides_valid?
+    
     self
   end
 
   def type
-    if is_equilateral?
-      return :equilateral
-    elsif is_isoceles?
-      return :isosceles
-    end
+    return :equilateral if is_equilateral?
+    return :isosceles if is_isoceles?
     :scalene
   end
 
   private
 
   def all_sides_valid?
-    if (((self.a + self.b) < self.c) && ((self.b + self.c) < self.a) && ((self.a + self.c) < self.b))
+    if (a + b) <= c
       return false
     end
     true
   end
 
-  def is_equilateral?()
+  def is_equilateral?
     (a == b && b == c)
   end
 
-  def is_isoceles?()
-    (a == b || b == c || a == c)
+  def is_isoceles?
+    # Since the sides are sorted, only need to test these conditions.
+    (a == b || b == c) && a != c
   end
 end
