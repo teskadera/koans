@@ -24,10 +24,16 @@ end
 class Triangle
   attr_reader :a, :b, :c
   def initialize(a, b, c)
-    if (a <= 0 || b <= 0 || c <= 0)
-      raise TriangleError, "A side is impossibly short"
-    end
     @a, @b, @c = a, b, c
+
+    if (self.a <= 0 || self.b <= 0 || self.c <= 0)
+      raise TriangleError, "A side is non-existent or negative"
+    end
+    if all_sides_valid?
+      raise TriangleError, "A side is impossibly short, with regards to the others"
+    end
+
+    self
   end
 
   def type
@@ -40,6 +46,13 @@ class Triangle
   end
 
   private
+
+  def all_sides_valid?
+    if (((self.a + self.b) < self.c) && ((self.b + self.c) < self.a) && ((self.a + self.c) < self.b))
+      return false
+    end
+    true
+  end
 
   def is_equilateral?()
     (a == b && b == c)
