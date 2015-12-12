@@ -30,7 +30,38 @@ require File.expand_path(File.dirname(__FILE__) + '/neo')
 # Your goal is to write the score method.
 
 def score(dice)
-  # You need to write this method
+  GreedRuleset.new.calculate_score(dice)
+end
+
+class GreedRuleset
+  attr_reader :rules
+  def initialize
+    @rules = [EmptySetRule.new, SingleRollRule.new]
+  end
+
+  def calculate_score(dice)
+    rules.inject(0) { |sum, rule| sum + rule.score(dice) }
+  end
+end
+
+class GreedRule
+  def score(dice)
+  end
+end
+
+class EmptySetRule < GreedRule
+  def score(dice)
+    0
+  end
+end
+
+class SingleRollRule < GreedRule
+  def score(dice)
+    return 0 if dice.size != 1
+    return 50 if dice.first == 5
+    return 100 if dice.first == 1
+    0
+  end
 end
 
 class AboutScoringProject < Neo::Koan
