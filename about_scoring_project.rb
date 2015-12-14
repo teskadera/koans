@@ -30,39 +30,91 @@ require File.expand_path(File.dirname(__FILE__) + '/neo')
 # Your goal is to write the score method.
 
 def score(dice)
-  GreedRuleset.new.calculate_score(dice)
+  roll = GreedRoll.new dice
+  rule_set = [ 
+    TripletRule.new(1, 1000),
+    TripletRule.new(2),
+    TripletRule.new(3),
+    TripletRule.new(4),
+    TripletRule.new(5),
+    TripletRule.new(6),
+    StaticValueRule.new(5, 50),
+    StaticValueRule.new(1, 100)
+  ]
+  roll.applyRuleset rule_set
+  roll.points
 end
 
-class GreedRuleset
-  attr_reader :rules
-  def initialize
-    @rules = [EmptySetRule.new, SingleRollRule.new]
+class GreedRoll
+  attr_accessor :roll_counts, :points
+  def initialize(dice)
+    @roll_counts = Hash.new 0
+    @points = 0
+    dice.each { | die | @roll_counts[die] += 1 }
   end
 
-  def calculate_score(dice)
-    rules.inject(0) { |sum, rule| sum + rule.score(dice) }
+  def applyRuleset(ruleset)
+    ruleset.each { |rule| apply(rule) }
+    nil
+  end
+
+  # Something about this doesn't feel quite right, but it's practice.
+  def apply(rule)
+    return nil if not rule.meets_conditions? self
+    rule.recalculate_score! self
+    rule.remove_scored_dice! self
+    nil
   end
 end
 
 class GreedRule
-  def score(dice)
+  def meets_conditions?(roll)
+  end
+
+  def recalculate_score!(roll)
+  end
+
+  def remove_scored_dice!(roll)
   end
 end
 
-class EmptySetRule < GreedRule
-  def score(dice)
-    0
+class TripletRule < GreedRule
+  def initialize(roll_value, point_multiplier = 100)
+    @roll_value, @point_multiplier = roll_value, point_multiplier
+  end
+
+  def meets_conditions?(roll)
+    roll.roll_counts[@roll_value] >= 3
+  end
+
+  def recalculate_score!(roll)
+    roll.points += @roll_value * @point_multiplier
+  end
+
+  def remove_scored_dice!(roll)
+    roll.roll_counts[@roll_value] -= 3
+  end
+
+end
+
+class StaticValueRule < GreedRule
+  def initialize(roll_value, point_value)
+    @roll_value, @point_value = roll_value, point_value
+  end
+
+  def meets_conditions?(roll)
+    roll.roll_counts[@roll_value] > 0
+  end
+
+  def recalculate_score!(roll)
+    roll.points += roll.roll_counts[@roll_value] * @point_value
+  end
+
+  def remove_scored_dice!(roll)
+    roll.roll_counts[@roll_value] = 0
   end
 end
 
-class SingleRollRule < GreedRule
-  def score(dice)
-    return 0 if dice.size != 1
-    return 50 if dice.first == 5
-    return 100 if dice.first == 1
-    0
-  end
-end
 
 class AboutScoringProject < Neo::Koan
   def test_score_of_an_empty_list_is_zero
