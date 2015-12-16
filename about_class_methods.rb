@@ -162,6 +162,10 @@ class AboutClassMethods < Neo::Koan
   #
   # Which do you prefer and why?
   # Are there times you might prefer one over the other?
+  # I'm still not sure what the difference is when it is used in a class def
+  # like that. SO lists this answer as the best-rated one on the subject:
+  # http://stackoverflow.com/q/2505067
+  # I still feel unenlightened; I'm sure it will come in time, when I revisit.
 
   # ------------------------------------------------------------------
 
